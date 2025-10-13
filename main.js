@@ -8,12 +8,17 @@ const character = {
   lost: false,
   elHP: document.getElementById("health-character"),
   elProgressbar: document.getElementById("progressbar-character"),
+  renderHPLife,
+  renderProgressbarHP,
+  renderHP,
+  changeHP,
 };
 
-renderHPLife = () => {
+function renderHPLife() {
   this.elHP.innerText = this.damageHP + " / " + this.defaultHP;
-};
-renderProgressbarHP = () => {
+}
+
+function renderProgressbarHP() {
   this.elProgressbar.style.width = this.damageHP + "%";
   if (this.damageHP > 60) {
     this.elProgressbar.style.background = "#4CAF50";
@@ -22,9 +27,14 @@ renderProgressbarHP = () => {
   } else {
     this.elProgressbar.style.background = "#F44336";
   }
-};
+}
 
-changeHP = (count) => {
+function renderHP() {
+  this.renderHPLife();
+  this.renderProgressbarHP();
+}
+
+function changeHP(count) {
   if (this.damageHP <= count) {
     this.damageHP = 0;
     this.renderHP();
@@ -36,12 +46,7 @@ changeHP = (count) => {
     this.damageHP -= count;
     this.renderHP();
   }
-};
-
-renderHP = () => {
-  this.renderHPLife();
-  this.renderProgressbarHP();
-};
+}
 
 const enemy1 = {
   name: "Charmander",
@@ -50,10 +55,10 @@ const enemy1 = {
   lost: false,
   elHP: document.getElementById("health-enemy1"),
   elProgressbar: document.getElementById("progressbar-enemy1"),
-  renderHPLife: character.renderHPLife,
-  renderProgressbarHP: character.renderProgressbarHP,
-  renderHP: character.renderHP,
-  changeHP: character.changeHP,
+  renderHPLife,
+  renderProgressbarHP,
+  renderHP,
+  changeHP,
 };
 
 const enemy2 = {
@@ -63,10 +68,10 @@ const enemy2 = {
   lost: false,
   elHP: document.getElementById("health-enemy2"),
   elProgressbar: document.getElementById("progressbar-enemy2"),
-  renderHPLife: character.renderHPLife,
-  renderProgressbarHP: character.renderProgressbarHP,
-  renderHP: character.renderHP,
-  changeHP: character.changeHP,
+  renderHPLife,
+  renderProgressbarHP,
+  renderHP,
+  changeHP,
 };
 
 function random(num) {
