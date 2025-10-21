@@ -97,7 +97,7 @@ function addLog({
   renderLogs();
 }
 
-function renderLogs() {
+const renderLogs = () => {
   $logs.innerHTML = logs
     .map(
       (t) =>
@@ -116,26 +116,22 @@ function attack(attacker, target, maxDamage) {
   });
 }
 
-// Функція-замикання для підрахунку і обмеження натискань
-function createClickLimiter(maxClicks = 7) {
+const createClickLimiter = (maxClicks = 7) => {
   let count = 0;
   return function () {
     count += 1;
     const remaining = Math.max(0, maxClicks - count);
     const allowed = count <= maxClicks;
-    // Повертаємо об'єкт з інформацією
     return { allowed, total: count, remaining };
   };
 }
 
-// Повісити обробник на всі кнопки .button і використати замикання для кожної
 document.querySelectorAll(".button").forEach((btn) => {
-  const limit = createClickLimiter(7); // тут можна змінити ліміт
+  const limit = createClickLimiter(7);
   const btnName = btn.id || btn.innerText.trim() || "button";
   btn.addEventListener("click", (e) => {
     const { allowed, total, remaining } = limit();
     console.log(`${btnName} clicked: ${total}. Remaining: ${remaining}`);
-    // Додати запис про натискання в лог (кожне натискання)
     addLog({
       attacker: btnName,
       target: "",
@@ -146,12 +142,9 @@ document.querySelectorAll(".button").forEach((btn) => {
     });
 
     if (!allowed) {
-      // відключити кнопку після вичерпання ліміту
       btn.disabled = true;
       return;
     }
-
-    // виконати пов'язані дії залежно від кнопки
     if (btn.id === "btn-kick") {
       attack(character, enemy1, 20);
       attack(character, enemy2, 20);
@@ -159,12 +152,11 @@ document.querySelectorAll(".button").forEach((btn) => {
       attack(character, enemy1, 10);
       attack(character, enemy2, 10);
     } else {
-      // Для інших кнопок — можна додати поведінку тут
     }
   });
 });
 
-function init() {
+const init = () => {
   character.renderHP();
   enemy1.renderHP();
   enemy2.renderHP();
