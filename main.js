@@ -75,15 +75,24 @@ function random(num) {
 
 const logs = [];
 
-function addLog({ attacker, target, damage, remaining }) {
+function addLog({
+  attacker,
+  target,
+  damage,
+  remaining,
+  remainingButtons = null,
+  note = "",
+}) {
   const time = new Date().toLocaleTimeString();
-  const text = `${time} — ${attacker} атакував ${target} і наніс ${damage} урона. Залишилося: ${remaining} / ${
-    target === enemy1.name ||
-    target === enemy2.name ||
-    target === character.name
-      ? 100
-      : 100
-  }`;
+  const hpPart =
+    typeof remaining === "number" ? `Залишилося: ${remaining} / 100` : "";
+  const btnPart =
+    remainingButtons !== null
+      ? ` | Натискань залишилося: ${remainingButtons}`
+      : "";
+  const text = `${time} — ${attacker}${target ? ` атакував ${target}` : ""}${
+    damage ? ` і наніс ${damage} урона.` : "."
+  } ${hpPart}${btnPart}${note ? ` ${note}` : ""}`;
   logs.unshift(text);
   renderLogs();
 }
@@ -107,14 +116,52 @@ function attack(attacker, target, maxDamage) {
   });
 }
 
-$btnKick.addEventListener("click", function () {
-  attack(character, enemy1, 20);
-  attack(character, enemy2, 20);
-});
+// Функція-замикання для підрахунку і обмеження натискань
+function createClickLimiter(maxClicks = 7) {
+  let count = 0;
+  return function () {
+    count += 1;
+    const remaining = Math.max(0, maxClicks - count);
+    const allowed = count <= maxClicks;
+    // Повертаємо об'єкт з інформацією
+    return { allowed, total: count, remaining };
+  };
+}
 
-$btnQuick.addEventListener("click", function () {
-  attack(character, enemy1, 10);
-  attack(character, enemy2, 10);
+// Повісити обробник на всі кнопки .button і використати замикання для кожної
+document.querySelectorAll(".button").forEach((btn) => {
+  const limit = createClickLimiter(7); // тут можна змінити ліміт
+  const btnName = btn.id || btn.innerText.trim() || "button";
+  btn.addEventListener("click", (e) => {
+    const { allowed, total, remaining } = limit();
+    console.log(`${btnName} clicked: ${total}. Remaining: ${remaining}`);
+    // Додати запис про натискання в лог (кожне натискання)
+    addLog({
+      attacker: btnName,
+      target: "",
+      damage: 0,
+      remaining: null,
+      remainingButtons: remaining,
+      note: allowed ? "" : "(ліміт досягнутий)",
+    });
+
+    if (!allowed) {
+      // відключити кнопку після вичерпання ліміту
+      btn.disabled = true;
+      return;
+    }
+
+    // виконати пов'язані дії залежно від кнопки
+    if (btn.id === "btn-kick") {
+      attack(character, enemy1, 20);
+      attack(character, enemy2, 20);
+    } else if (btn.id === "btn-quick") {
+      attack(character, enemy1, 10);
+      attack(character, enemy2, 10);
+    } else {
+      // Для інших кнопок — можна додати поведінку тут
+    }
+  });
 });
 
 function init() {
